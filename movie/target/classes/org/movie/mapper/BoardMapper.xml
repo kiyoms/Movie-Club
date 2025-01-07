@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.movie.mapper.BoardMapper">
+	
+	
+	<select id="getBoardList" resultType="org.movie.model.BoardDTO">
+		select *  from board
+	</select>
+	
+	<select id="getArticleCount" resultType="int">
+		select count(*) from board where contenttype='자유'
+	</select>
+	
+	<select id="getWriterCount" resultType="int">
+		select count(*) from board where contenttype='자유' and writer LIKE '%'||#{searchtext}||'%'
+	</select>
+	
+	<select id="getContentCount" resultType="int">
+		select count(*) from board where contenttype='자유' and content LIKE '%'||#{searchtext}||'%'
+	</select>
+	
+	<select id="getTitleCount" resultType="int">
+		select count(*) from board where contenttype='자유' and title LIKE '%'||#{searchtext}||'%'
+	</select>
+	
+	<select id="getsubjcontCount" resultType="int">
+		select count(*) from board where contenttype='자유' and title LIKE '%'||#{searchtext}||'%' or content LIKE '%'||#{searchtext}||'%'
+	</select>
+	
+
+	
+	<select id="getConceptWriterCount" resultType="int">
+		select count(*) from board where contenttype='자유' and writer LIKE '%'||#{searchtext}||'%' and recommend >= 10
+	</select>
+	
+	<select id="getConceptContentCount" resultType="int">
+		select count(*) from board where contenttype='자유' and content LIKE '%'||#{searchtext}||'%' and recommend >= 10
+	</select>
+	
+	<select id="getConceptTitleCount" resultType="int">
+		select count(*) from board where contenttype='자유' and title LIKE '%'||#{searchtext}||'%' and recommend >= 10
+	</select>
+	
+	<select id="getConceptsubjcontCount" resultType="int">
+	select count(*) from (select * from board where recommend >= 10 and title LIKE '%'||#{searchtext}||'%' or content LIKE '%'||#{searchtext}||'%') where recommend >= 10  and contenttype='자유'
+ 
+	</select>
+	
+	<select id="getInformationConceptWriterCount" resultType="int">
+		select count(*) from board where contenttype='정보' and writer LIKE '%'||#{searchtext}||'%' and recommend >= 10 
+	</select>
+	
+	<select id="getInformationConceptContentCount" resultType="int">
+		select count(*) from board where contenttype='정보' and content LIKE '%'||#{searchtext}||'%' and recommend >= 10
+	</select>
+	
+	<select id="getInformationConceptTitleCount" resultType="int">
+		select count(*) from board where contenttype='정보' and title LIKE '%'||#{searchtext}||'%' and recommend >= 10
+	</select>
+	
+	<select id="getInformationConceptsubjcontCount" resultType="int">
+		select count(*) from (select * from board where recommend >= 10 and title LIKE '%'||#{searchtext}||'%' or content LIKE '%'||#{searchtext}||'%') where recommend >= 10  and contenttype='정보'
+	</select>
+	
+	
+	
+		<select id="getInformationWriterCount" resultType="int">
+		select count(*) from board where contenttype='정보' and writer LIKE '%'||#{searchtext}||'%'
+	</select>
+	
+	<select id="getInformationContentCount" resultType="int">
+		select count(*) from board where contenttype='정보' and content LIKE '%'||#{searchtext}||'%'
+	</select>
+	
+	<select id="getInformationTitleCount" resultType="int">
+		select count(*) from board where contenttype='정보' and title LIKE '%'||#{searchtext}||'%'
+	</select>
+	
+	<select id="getInformationsubjcontCount" resultType="int">
+		select count(*) from board where contenttype='정보' and title LIKE '%'||#{searchtext}||'%' or content LIKE '%'||#{searchtext}||'%'
+	</select>
+	
+	
+
+	<select id="getConceptCount" resultType="int">
+		select count(*) from board where recommend >= 10  AND contenttype='자유'
+	</select>
+	
+	<select id="getInformationCount" resultType="int">
+		select count(*) from board where contenttype='정보'
+	</select>
+	
+	<select id="getInformationConceptCount" resultType="int">
+		select count(*) from board where recommend >= 10  AND contenttype='정보'
+	</select>
+	
+	<select id="getConcept" resultType="org.movie.model.BoardDTO">
+	<![CDATA[   select * from 
+            (select board.* , rownum r from 
+               (select  bno,
+               title,
+               writer,
+               regdate,
+               viewcnt,
+               comcnt,
+               recommend
+                    from board where recommend >= 10 AND contenttype ='자유' order by bno desc ) board) 
+                  where r > #{startIndex}  and r <= #{startIndex}+10
+                	]]>
+      </select>
+	
+	<select id="getInformationConcept" resultType="org.movie.model.BoardDTO">
+	<![CDATA[ select * from 
+            (select board.* , rownum r from 
+               (select  bno,
+               title,
+               writer,
+               regdate,
+               viewcnt,
+               comcnt,
+               recommend
+                    from board where recommend >= 10 AND contenttype ='정보' order by bno desc ) board) 
+                  where r > #{startIndex}  and r <= #{startIndex}+10
+                	]]>
+      </select>
+
+	 <select id="getInformationArticles" resultType="org.movie.model.BoardDTO">
+			<![CDATA[	select * from 
+				(select board.* , rownum r from 
+					(select  bno,
+					title,
+					writer,
+					regdate,
+					viewcnt,
+					comcnt,
+					recommend from board where contenttype ='정보' order by bno desc) board) 
+						where r > #{startIndex}  and r <= #{startIndex}+10
+			]]>
+	</select>
+		
+	 <!--<select id="getArticles" resultType="org.movie.model.BoardDTO">
+		 select bno,
+				title,
+				writer,
+				regdate,
+				viewcnt,
+				comcnt,
+				recommend
+				from board
+				order by bno desc
+	</select> -->
+	
+	 <select id="getArticles" resultType="org.movie.model.BoardDTO">
+			<![CDATA[	select * from 
+				(select board.* , rownum r from 
+					(select  bno,
+					title,
+					writer,
+					regdate,
+					viewcnt,
+					comcnt,
+					recommend  from board where contenttype ='자유' order by bno desc) board) 
+						where r > #{startIndex}  and r <= #{startIndex}+10 
+			]]>
+	</select>
+	
+		 <select id="getWriterSearch" resultType="org.movie.model.BoardDTO">
+			<![CDATA[	select * from 
+				(select board.* , rownum r from 
+					(select  bno,
+					title,
+					writer,
+					regdate,
+					viewcnt,
+					comcnt,
+					recommend  from board where contenttype ='자유' AND writer LIKE '%'||#{searchtext}||'%' order by bno desc) board) 
+						where r > #{startIndex}  and r <= #{startIndex}+10
+			]]>
+	</select>
+	<select id="getTitleSearch" resultType="org.movie.model.BoardDTO">
+			<![CDATA[	select * from 
+				(select board.* , rownum r from 
+					(select  bno,
+					title,
+					writer,
+					regdate,
+					viewcnt,
+					comcnt,
+					recommend  from board where contenttype ='자유' AND title LIKE '%'||#{searchtext}||'%' order by bno desc) board) 
+						where r > #{startIndex}  and r <= #{startIndex}+10 
+			]]>
+	</select>
+	<select id="getContentSearch" resultType="org.movie.model.BoardDTO">
+			<![CDATA[	select * from 
+				(select board.* , rownum r from 
+					(select  bno,
+					title,
+					writer,
+					regdate,
+					viewcnt,
+					comcnt,
+					recommend  from board where contenttype ='자유' AND content LIKE '%'||#{searchtext}||'%' order by bno desc) board) 
+						where r > #{startIndex}  and r <= #{startIndex}+10 
+			]]>
+	</select>
+	<select id="getsubjcontSearch" resultType="org.movie.model.BoardDTO">
+			<![CDATA[	select * from 
+				(select board.* , rownum r from 
+					(select  bno,
+					title,
+					writer,
+					regdate,
+					viewcnt,
+					comcnt,
+					recommend  from board where contenttype ='자유' AND title LIKE '%'||#{searchtext}||'%' OR content LIKE '%'||#{searchtext}||'%' order by bno desc) board) 
+						where r > #{startIndex}  and r <= #{startIndex}+10 
+			]]>
+	</select>
+	 <select id="getInformationWriterSearch" resultType="org.movie.model.BoardDTO">
+			<![CDATA[	select * from 
+				(select board.* , rownum r from 
+					(select  bno,
+					title,
+					writer,
+					regdate,
+					viewcnt,
+					comcnt,
+					recommend  from board where contenttype ='정보' AND writer LIKE '%'||#{searchtext}||'%' order by bno desc) board) 
+						where r > #{startIndex}  and r <= #{startIndex}+10 
+			]]>
+	</select>
+	<select id="getInformationTitleSearch" resultType="org.movie.model.BoardDTO">
+			<![CDATA[	select * from 
+				(select board.* , rownum r from 
+					(select  bno,
+					title,
+					writer,
+					regdate,
+					viewcnt,
+					comcnt,
+					recommend  from board where contenttype ='정보' AND title LIKE '%'||#{searchtext}||'%' order by bno desc) board) 
+						where r > #{startIndex}  and r <= #{startIndex}+10 
+			]]>
+	</select>
+	<select id="getInformationContentSearch" resultType="org.movie.model.BoardDTO">
+			<![CDATA[	select * from 
+				(select board.* , rownum r from 
+					(select  bno,
+					title,
+					writer,
+					regdate,
+					viewcnt,
+					comcnt,
+					recommend  from board where contenttype ='정보' AND content LIKE '%'||#{searchtext}||'%' order by bno desc) board) 
+						where r > #{startIndex}  and r <= #{startIndex}+10 
+			]]>
+	</select>
+	<select id="getInformationsubjcontSearch" resultType="org.movie.model.BoardDTO">
+			<![CDATA[	select * from 
+				(select board.* , rownum r from 
+					(select  bno,
+					title,
+					writer,
+					regdate,
+					viewcnt,
+					comcnt,
+					recommend  from board where contenttype ='정보' AND writer LIKE '%'||#{searchtext}||'%' OR content LIKE '%'||#{searchtext}||'%' order by bno desc) board) 
+						where r > #{startIndex}  and r <= #{startIndex}+10 
+			]]>
+	</select>
+	
+	 <select id="getConceptWriterSearch" resultType="org.movie.model.BoardDTO">
+			<![CDATA[	select * from 
+				(select board.* , rownum r from 
+					(select  bno,
+					title,
+					writer,
+					regdate,
+					viewcnt,
+					comcnt,
+					recommend  from board where contenttype ='자유' AND recommend >= 10 AND writer LIKE '%'||#{searchtext}||'%' order by bno desc) board) 
+						where r > #{startIndex}  and r <= #{startIndex}+10
+			]]>
+	</select>
+	<select id="getConceptTitleSearch" resultType="org.movie.model.BoardDTO">
+			<![CDATA[	select * from 
+				(select board.* , rownum r from 
+					(select  bno,
+					title,
+					writer,
+					regdate,
+					viewcnt,
+					comcnt,
+					recommend  from board where contenttype ='자유' AND recommend >= 10 AND title LIKE '%'||#{searchtext}||'%' order by bno desc) board) 
+						where r > #{startIndex}  and r <= #{startIndex}+10 
+			]]>
+	</select>
+	<select id="getConceptContentSearch" resultType="org.movie.model.BoardDTO">
+			<![CDATA[	select * from 
+				(select board.* , rownum r from 
+					(select  bno,
+					title,
+					writer,
+					regdate,
+					viewcnt,
+					comcnt,
+					recommend  from board where contenttype ='자유' AND recommend >= 10 AND content LIKE '%'||#{searchtext}||'%' order by bno desc) board) 
+						where r > #{startIndex}  and r <= #{startIndex}+10 
+			]]>
+	</select>
+	<select id="getConceptsubjcontSearch" resultType="org.movie.model.BoardDTO">
+			<![CDATA[	select * from 
+				(select board.* , rownum r from 
+					(select  bno,
+					title,
+					writer,
+					regdate,
+					viewcnt,
+					comcnt,
+					recommend,
+					contenttype  from board where title LIKE '%'||#{searchtext}||'%' OR content LIKE '%'||#{searchtext}||'%' order by bno desc) board where recommend >= 10 AND contenttype ='자유' ) 
+						where r > #{startIndex}  and r <= #{startIndex}+10
+			]]>
+	</select>
+	 <select id="getInformationConceptWriterSearch" resultType="org.movie.model.BoardDTO">
+			<![CDATA[	select * from 
+				(select board.* , rownum r from 
+					(select  bno,
+					title,
+					writer,
+					regdate,
+					viewcnt,
+					comcnt,
+					recommend  from board where contenttype ='정보' AND recommend >= 10 AND writer LIKE '%'||#{searchtext}||'%' order by bno desc) board) 
+						where r > #{startIndex}  and r <= #{startIndex}+10 
+			]]>
+	</select>
+	<select id="getInformationConceptTitleSearch" resultType="org.movie.model.BoardDTO">
+			<![CDATA[	select * from 
+				(select board.* , rownum r from 
+					(select  bno,
+					title,
+					writer,
+					regdate,
+					viewcnt,
+					comcnt,
+					recommend  from board where contenttype ='정보' AND recommend >= 10 AND title LIKE '%'||#{searchtext}||'%' order by bno desc) board) 
+						where r > #{startIndex}  and r <= #{startIndex}+10 
+			]]>
+	</select>
+	<select id="getInformationConceptContentSearch" resultType="org.movie.model.BoardDTO">
+			<![CDATA[	select * from 
+				(select board.* , rownum r from 
+					(select  bno,
+					title,
+					writer,
+					regdate,
+					viewcnt,
+					comcnt,
+					recommend  from board where contenttype ='정보' AND recommend >= 10 AND content LIKE '%'||#{searchtext}||'%' order by bno desc) board) 
+						where r > #{startIndex}  and r <= #{startIndex}+10 
+			]]>
+	</select>
+	<select id="getInformationConceptsubjcontSearch" resultType="org.movie.model.BoardDTO">
+			<![CDATA[	select * from 
+				(select board.* , rownum r from 
+					(select  bno,
+					title,
+					writer,
+					regdate,
+					viewcnt,
+					comcnt,
+					recommend,
+					contenttype  from board where writer LIKE '%'||#{searchtext}||'%' OR content LIKE '%'||#{searchtext}||'%' order by bno desc) board where recommend >= 10 AND contenttype ='정보') 
+						where r > #{startIndex}  and r <= #{startIndex}+10 
+			]]>
+	</select>
+	
+	
+	<select id="getArticleList" resultType="org.movie.model.BoardDTO">
+		 select bno,
+				title,
+				writer,
+				regdate,
+				viewcnt,
+				comcnt,
+				recommend
+				from board where contenttype='자유'
+				order by bno
+	</select>
+	
+	<select id="getContent" resultType="org.movie.model.BoardDTO">
+		select * from board where bno=#{bno}
+	</select>
+		
+	<select id="getNotice" resultType="org.movie.model.NoticeDTO">
+		select * from noticeboard
+	</select>
+	<select id="getNoticeContent" resultType="org.movie.model.NoticeDTO">
+		select * from noticeboard where bno =#{bno}
+	</select>
+	
+	<insert id="insertArticle">
+		insert into board values(
+			board_seq.NEXTVAL,
+			#{title},
+			#{writer},
+			#{content},
+			sysdate,
+			0,
+			0,
+			0,
+			'자유'
+		)
+	</insert>
+	<insert id="insertInformationArticle">
+		insert into board values(
+			board_seq.NEXTVAL,
+			#{title},
+			#{writer},
+			#{content},
+			sysdate,
+			0,
+			0,
+			0,
+			'정보'
+		)
+	</insert>
+	<insert id="insertComment">
+		insert into coment values(
+			#{bno},
+			#{comwriter},
+			#{comcontent},
+			sysdate,
+			coment_seq.NEXTVAL
+		)
+	</insert>
+	
+		
+	<update id="noticeViewCntUp">
+		update noticeboard set viewcnt=viewcnt+1 where bno=#{bno}
+	</update>
+	<update id="noticeComCntUp">
+		update noticeboard set comcnt=comcnt+1 where bno=#{bno}
+	</update>
+		<update id="noticeRecommendCntUp">
+		update noticeboard set recommend=recommend+1 where bno=#{bno}
+	</update>
+	
+	<update id="viewCntUp">
+		update board set viewcnt=viewcnt+1 where bno=#{bno}
+	</update>
+	<update id="comCntUp">
+		update board set comcnt=comcnt+1 where bno=#{bno}
+	</update>
+	<update id="comCntDown">
+		update board set comcnt=comcnt-1 where bno=#{bno}
+	</update>
+	<select id="getComment" resultType="org.movie.model.CommentDTO">
+		select * from coment where bno=#{bno} order by regdate
+	</select>
+	<select id="getArticle" resultType="org.movie.model.BoardDTO">
+		select * from board where bno=#{bno}
+	</select>	
+		<delete id="deleteArticle">
+		delete from board where bno=#{bno}
+	
+	</delete>
+	<delete id="deleteComment">
+		delete from coment where comno=#{comno}
+	</delete>
+	
+	<delete id="deleteContentComment">
+		delete from coment where bno = #{bno}
+	</delete>
+	
+	<update id="updateContent">
+		update board set content=#{content},writer=#{writer},title =#{title} where bno=#{bno}
+	</update>
+	
+	<update id="recommendCntUp">
+		update board set recommend=recommend+1 where bno=#{bno}
+	</update>
+	
+</mapper>	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

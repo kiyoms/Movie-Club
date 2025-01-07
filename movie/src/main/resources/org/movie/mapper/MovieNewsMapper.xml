@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="org.movie.mapper.MovieNewsMapper">
+	
+	<select id="getList" resultType="org.movie.model.FilmMakerDTO">
+		select * from filmmaker
+	</select>
+	
+	<insert id="setFilmMaker" parameterType="org.movie.model.FilmMakerDTO">
+		insert into filmmaker values(
+			fnum_seq.nextval ,
+			#{name},
+			#{gneder},
+			#{birth},
+			#{field},
+			#{exhibit},
+			#{awards},
+			#{profile}
+		)
+	</insert>
+	
+	
+	<select id="getSearch" resultType="org.movie.model.FilmMakerDTO">
+		select * from filmmaker where name  like '%'||#{search}||'%'
+		    
+	</select>
+	
+	<select id="getContent" resultType="org.movie.model.FilmMakerDTO">
+		select * from filmmaker where fnum=#{fnum}
+		
+			    
+	</select>
+
+</mapper>
+
