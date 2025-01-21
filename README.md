@@ -49,6 +49,9 @@ Tool : Spring Framework<br>
 ### 주요코드 (게시판)
 
 ```
+Pagination.java의 일부
+페이징 처리할 범위를 정해주는 코드
+
     public void rangeSetting(int curPage){
         
         setCurRange(curPage);        
@@ -69,22 +72,11 @@ Tool : Spring Framework<br>
     }
     
 ```
+
 ```
-<![CDATA[	select * from 
-		(select board.* , rownum r from 
-				(select  bno,
-				title,
-				writer,
-				regdate,
-				viewcnt,
-				comcnt,
-				recommend,
-				contenttype  from board where title LIKE '%'||#{searchtext}||'%' OR content LIKE '%'||#{searchtext}||'%' order by bno desc) board where recommend >= 10 AND contenttype ='자유' ) 
-				where r > #{startIndex}  and r <= #{startIndex}+10
-]]>
-   
-```
-```
+BoardController.java의 일부
+
+pagination.java에서 가져온 값으로 페이징 처리 한 값을 가져옴
 if(searchname.equals("")) {
 		count = service.getArticleCount();
 		Pagination pagination = new Pagination(count,curPage);
@@ -92,12 +84,12 @@ if(searchname.equals("")) {
 	    model.addAttribute("list",articleList);
 	    model.addAttribute("pagination",pagination);
 		 return "board/list";
-		}
+}
   
 ```
 ```
 <div align="center">
-
+list.jsp에서 페이징 처리
                     <c:if test="${pagination.curRange ne 1 }">
                         <a href="#" onClick="fn_paging(1)">[처음]</a> 
                     </c:if>
