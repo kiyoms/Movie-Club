@@ -37,6 +37,14 @@ Tool : Spring Framework<br>
 이태기 : 관리자 페이지<br>
 박갑용 : 영화 리스트, 영화 기본 정보 페이지<br>
  
+### DB테이블 정의서(게시판)
+
+![image](https://github.com/user-attachments/assets/054d1f72-b1e3-43ce-838c-472f202fccc9)
+
+![image](https://github.com/user-attachments/assets/cfc69e58-19e6-4315-a471-baa656299838)
+
+
+
 
 ### 주요코드 (게시판)
 
