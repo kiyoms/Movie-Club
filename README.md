@@ -10,7 +10,7 @@
 개발언어: JAVA11, Python, JavaScript
 DBMS : ORACLE SQL12C<br>
 API : Chart.js<br>
-Tool : Spring Framework 
+Tool : Spring Framework<br>
 멤버: 박성빈,문기용,조성혁,이태기,박갑용<br>
 
 
@@ -41,48 +41,53 @@ Tool : Spring Framework
 ### 주요코드 (게시판)
 
 ```
-   <c:forEach items="${notice}" var="notice">
-    <tr>
-    <td><c:out value="${notice.bno}"/></td>
-    <td name="bno"><a href="/board/notice?bno=${notice.bno}">               
-
-      <strong><c:out value="${notice.title}"/></strong><!-- [<c:out value="${notice.comcnt}"/>]  --> </a></td>
-       <td><strong><c:out value="${notice.writer}"/></strong></td>
-       <td><fmt:formatDate value="${notice.regdate}" pattern="yy-MM-dd a hh:mm"/></td>
-       <td><c:out value="${notice.viewcnt}"/></td>
-       <td><c:out value="${notice.recommend}"/></td>
-    </tr>
-    </c:forEach>
- <c:forEach items="${list}" var="list">
-    <tr>
-    <td><c:out value="${list.bno}"/></td>
-    <td name="bno" id="thick${list.bno}"><a href="/board/content?bno=${list.bno}">
-       <c:choose>
-          <c:when test="${list.recommend >= 10}">
-             <strong><c:out value="${list.title}"/>  [<c:out value="${list.comcnt}"/>]</strong><!-- Result값이 있다면 실행할 로직 -->
-                </c:when>
-                   <c:otherwise>
-                      <c:out value="${list.title}"/>  [<c:out value="${list.comcnt}"/>] <!-- 그렇지 않다면 실행할 로직 -->
-                   </c:otherwise>
-       </c:choose>
-    </a></td>
-<td><c:out value="${list.writer}"/></td>
-<td><fmt:formatDate value="${list.regdate}" pattern="yy-MM-dd a hh:mm"/></td>
-<td><c:out value="${list.viewcnt}"/></td>
-<td><c:out value="${list.recommend}"/></td>
-   <c:choose>
-            <c:when test="${id.name == '관리자'}">
-                <td><button type="button" id="delete"  class="btn btn-outline btn-primary pull-right"  onClick="deleteIdCheck('${list.bno}')">게시글 삭제  </button></td>
-          </c:when>
-               <c:otherwise>
-               </c:otherwise>      
-                  </c:choose>
-					            </tr>
-					            	<input type="hidden" name="list" id="list" value="${list}"/>
-					            	<input type="hidden" name="listNum" id="recommend${list.bno}" value="${list.recommend}"/>
-					           </c:forEach>
-----
-
+    public void rangeSetting(int curPage){
+        
+        setCurRange(curPage);        
+        this.startPage = (curRange - 1) * rangeSize + 1;
+        this.endPage = startPage + rangeSize - 1;
+        
+        if(endPage > pageCnt){
+            this.endPage = pageCnt;
+        }
+        
+        this.prevPage = curPage - 1;
+        this.nextPage = curPage + 1;
+    }
+    
+    
+    public void setCurRange(int curPage) {
+        this.curRange = (int)((curPage-1)/rangeSize) + 1;
+    }
+    
+```
+```
+<![CDATA[	select * from 
+		(select board.* , rownum r from 
+				(select  bno,
+				title,
+				writer,
+				regdate,
+				viewcnt,
+				comcnt,
+				recommend,
+				contenttype  from board where title LIKE '%'||#{searchtext}||'%' OR content LIKE '%'||#{searchtext}||'%' order by bno desc) board where recommend >= 10 AND contenttype ='자유' ) 
+				where r > #{startIndex}  and r <= #{startIndex}+10
+]]>
+   
+```
+```
+if(searchname.equals("")) {
+		count = service.getArticleCount();
+		Pagination pagination = new Pagination(count,curPage);
+		articleList = service.getArticles(pagination.getStartIndex());
+	    model.addAttribute("list",articleList);
+	    model.addAttribute("pagination",pagination);
+		 return "board/list";
+		}
+  
+```
+```
 <div align="center">
 
                     <c:if test="${pagination.curRange ne 1 }">
@@ -109,153 +114,8 @@ Tool : Spring Framework
                     </c:if>
                 </div>
                 <div align="center">
-                <form action="" name="searchOption" method="GET">
-                <select name="searchname" style="height:30px;">
-                <option value="title">제목</option>
-                <option value="subjcont">제목+내용</option>
-                <option value="writer">글쓴이</option>
-                <option value="content">내용</option>
-                </select>
-                <input type="text" style="height:30px;" name="searchtext"><button type="submit"> <img src="${path}/resources/image/search.png" height ="30" width="30" /></button>
-                </form>
-                </div>
-list.jsp
 
 ```
-
-```
-<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-bs4.css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-bs4.js"></script>
-<!-- include summernote-ko-KR -->
-<script src="/resources/js/summernote-ko-KR.js"></script>
-<title>글쓰기</title>
-
-<script>
-$(document).ready(function() {
-	  $('#summernote').summernote({
- 	    	placeholder: 'content',
-	        minHeight: 370,
-	        maxHeight: null,
-	        focus: true, 
-	        lang : 'ko-KR'
-	  });
-	});
-</script>
-</head>
-<body>
-<h2 style="text-align: center;">글 작성</h2><br><br><br>
-
-<div style="width: 60%; margin: auto;">
-	<form method="post" name="writeform" action="/board/writePro" onsubmit="return writeSave()">
-		<input type="hidden" name="writer" style="width: 20%;" value="${id.id}"/>작성자 : ${id.id}<br>
-		<input type="text" name="title" style="width: 40%;" placeholder="제목"/>
-		<br><br> 
-		<textarea id="summernote" name="content"></textarea>
-		<input id="subBtn" type="button" value="작성하기" style="float: right;" onclick="goWrite(this.form)"/>
-		<input id="subBtn" type="button" value="취소하기" style="float: right;" onclick="window.history.go(-1); return false;"/>
-		
-	</form>
-</div>
-<a href="/board/list"></a>
-</body>
-
-writeform
-```
-
-```
-	 <select id="getArticles" resultType="org.movie.model.BoardDTO">
-			<![CDATA[	select * from 
-				(select board.* , rownum r from 
-					(select  bno,
-					title,
-					writer,
-					regdate,
-					viewcnt,
-					comcnt,
-					recommend  from board where contenttype ='자유' order by bno desc) board) 
-						where r > #{startIndex}  and r <= #{startIndex}+10 
-			]]>
-	</select>
-	
-		 <select id="getWriterSearch" resultType="org.movie.model.BoardDTO">
-			<![CDATA[	select * from 
-				(select board.* , rownum r from 
-					(select  bno,
-					title,
-					writer,
-					regdate,
-					viewcnt,
-					comcnt,
-					recommend  from board where contenttype ='자유' AND writer LIKE '%'||#{searchtext}||'%' order by bno desc) board) 
-						where r > #{startIndex}  and r <= #{startIndex}+10
-			]]>
-	</select>
-
-board mapper.xml
-
-컨텐츠 불러오는거랑 검색기능
-```
-```
-
-function goWrite(frm) {
-   var comwriter = frm.comwriter.value
-   var comcontent = frm.comcontent.value;
-   
-   if (comwriter.length > 8){
-      alert("닉네임은 8글자 이내로 해주세요.")
-      return false;
-   } 
-   if (comcontent.length > 500){
-      alert("댓글 내용은 500글자 이내로 작성해주세요.");
-      return false;
-      }
- 
-   if (comcontent.trim() == ''){
-      alert("내용을 입력해주세요");
-      return false;
-   }
-   frm.submit();
-}
-
-function modifyIdCheck(){
-   if('${dto.writer}' == '${id.id}'){
-   location.href='informationModifyForm?bno='+${dto.bno};
-   }
-   else{
-      alert("다른사람의 게시글은 수정할 수 없습니다.")
-      return false;
-   }
-   
-}
-
-function deleteIdCheck(){
-	if(confirm("정말 삭제하시겠습니까?")){
-   if("${dto.writer}" == "${id.id}"){
-      
-      location.href='deleteForm?bno='+${dto.bno}
-      }
-      else{
-         alert("다른사람의 게시글은 삭제할 수 없습니다.");
-         return false;
-      }
-	}
-}
-
-function recommendCheck(){
-   if('${dto.writer}' == '${id.id}'){
-      alert("자기 글은 추천할 수 없습니다!");
-   }
-   else{
-      location.href='recommendPro?bno='+${dto.bno};
-   }
-}
-다른 사람의 게시글을 수정,삭제하지 못하게 게시글의 작성자와 
-로그인한 작성자가 다르면 수정,삭제를 하지 못하게함
-같은 방식으로 자신이 작성한 게시글은 추천하지 못하게 함
-content.jsp
-```
-
-
 
 
 ### 느낀점
