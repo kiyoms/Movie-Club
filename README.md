@@ -116,7 +116,91 @@ list.jsp에서 페이징 처리
                 <div align="center">
 
 ```
+```
+writeform.jsp의 일부
+글 제목이 너무 길거나, 제목이 없거나, 글씨 최대 한도를 초과하거나, 글 내용이 없을경우 예외처리를 실행
 
+<script>
+function goWrite(frm) {
+	var title = frm.title.value;
+	var writer = frm.writer.value;
+	var content = frm.content.value;
+	if(title.length > 30){
+		alert("글 제목은 30글자 이내로 해주세요");
+		return false;
+	}
+
+	if(content.length > 900){
+		alert("게시글은 최대 900자까지 가능합니다.");
+		return false;
+	}
+	if (title.trim() == ''){
+		alert("제목을 입력해주세요");
+		return false;
+	}
+
+	if (content.trim() == ''){
+		alert("내용을 입력해주세요");
+		return false;
+	}
+	frm.submit();
+}
+</script>
+
+```
+```
+content.jsp의 일부
+게시글을 수정하거나 댓글을 달 때 예외처리
+댓글 내용이 너무 길거나, 글을 적지않은 다른 사람이 글을 수정하거나
+글을 쓴 사람이 자기 글을 추천할경우 예외처리가 발생
+
+
+   if (comcontent.length > 500){
+      alert("댓글 내용은 500글자 이내로 작성해주세요.");
+      return false;
+      }
+
+   if (comcontent.trim() == ''){
+      alert("내용을 입력해주세요");
+      return false;
+   }
+   frm.submit();
+}
+
+function modifyIdCheck(){
+   if('${dto.writer}' == '${id.id}'){
+   location.href='informationModifyForm?bno='+${dto.bno};
+   }
+   else{
+      alert("다른사람의 게시글은 수정할 수 없습니다.")
+      return false;
+   }
+   
+}
+
+function deleteIdCheck(){
+	if(confirm("정말 삭제하시겠습니까?")){
+   if("${dto.writer}" == "${id.id}"){
+      
+      location.href='deleteForm?bno='+${dto.bno}
+      }
+      else{
+         alert("다른사람의 게시글은 삭제할 수 없습니다.");
+         return false;
+      }
+	}
+}
+
+function recommendCheck(){
+   if('${dto.writer}' == '${id.id}'){
+      alert("자기 글은 추천할 수 없습니다!");
+   }
+   else{
+      location.href='recommendPro?bno='+${dto.bno};
+   }
+}
+
+```
 
 ### 느낀점
 
